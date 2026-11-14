@@ -1,0 +1,422 @@
+[
+  {
+    "name": "unsupported-or",
+    "routes": [
+      {
+        "path": "/request",
+        "body": {
+          "expr": {
+            "or": [
+              {
+                "contains": [
+                  "title",
+                  "检修"
+                ]
+              },
+              {
+                "contains": [
+                  "summary",
+                  "检修"
+                ]
+              }
+            ]
+          },
+          "sources": [
+            "/source/a"
+          ]
+        },
+        "status": 200,
+        "method": "GET"
+      },
+      {
+        "path": "/source/a/capabilities",
+        "body": {
+          "fields": [
+            "title",
+            "summary"
+          ],
+          "operators": [
+            "contains"
+          ],
+          "supportsOr": false,
+          "limit": 10,
+          "nextSupported": true
+        },
+        "status": 200,
+        "method": "GET"
+      },
+      {
+        "path": "/source/a/search",
+        "body": {
+          "items": [
+            {
+              "id": "1",
+              "fields": {
+                "title": "桥梁检修",
+                "summary": "定期维护"
+              }
+            }
+          ],
+          "next": null,
+          "truncated": false
+        },
+        "status": 200,
+        "method": "POST"
+      }
+    ],
+    "expected": [
+      {
+        "source": "/source/a",
+        "sourceId": "1",
+        "predicateStatus": "match",
+        "coverage": "exhaustive"
+      }
+    ],
+    "forbidden": []
+  },
+  {
+    "name": "missing-field-truncated",
+    "routes": [
+      {
+        "path": "/request",
+        "body": {
+          "expr": {
+            "not": {
+              "eq": [
+                "status",
+                "draft"
+              ]
+            }
+          },
+          "sources": [
+            "/source/a"
+          ]
+        },
+        "status": 200,
+        "method": "GET"
+      },
+      {
+        "path": "/source/a/capabilities",
+        "body": {
+          "fields": [
+            "title"
+          ],
+          "operators": [
+            "contains"
+          ],
+          "supportsOr": false,
+          "limit": 1,
+          "nextSupported": false
+        },
+        "status": 200,
+        "method": "GET"
+      },
+      {
+        "path": "/source/a/search",
+        "body": {
+          "items": [
+            {
+              "id": "2",
+              "fields": {
+                "title": "桥梁"
+              }
+            }
+          ],
+          "next": null,
+          "truncated": true
+        },
+        "status": 200,
+        "method": "POST"
+      }
+    ],
+    "expected": [
+      {
+        "source": "/source/a",
+        "sourceId": "2",
+        "predicateStatus": "unknown",
+        "coverage": "partial"
+      }
+    ],
+    "forbidden": []
+  },
+  {
+    "name": "truncated-filter",
+    "routes": [
+      {
+        "path": "/request",
+        "body": {
+          "expr": {
+            "or": [
+              {
+                "contains": [
+                  "title",
+                  "检修"
+                ]
+              },
+              {
+                "contains": [
+                  "summary",
+                  "检修"
+                ]
+              }
+            ]
+          },
+          "sources": [
+            "/source/a"
+          ]
+        },
+        "status": 200,
+        "method": "GET"
+      },
+      {
+        "path": "/source/a/capabilities",
+        "body": {
+          "fields": [
+            "title",
+            "summary"
+          ],
+          "operators": [
+            "contains"
+          ],
+          "supportsOr": false,
+          "limit": 10,
+          "nextSupported": true
+        },
+        "status": 200,
+        "method": "GET"
+      },
+      {
+        "path": "/source/a/search",
+        "body": {
+          "items": [
+            {
+              "id": "1",
+              "fields": {
+                "title": "桥梁检修",
+                "summary": "定期维护"
+              }
+            }
+          ],
+          "next": null,
+          "truncated": true
+        },
+        "status": 200,
+        "method": "POST"
+      }
+    ],
+    "expected": [
+      {
+        "source": "/source/a",
+        "sourceId": "1",
+        "coverage": "partial"
+      }
+    ],
+    "forbidden": []
+  },
+  {
+    "name": "same-local-id-two-sources",
+    "routes": [
+      {
+        "path": "/request",
+        "body": {
+          "expr": {
+            "or": [
+              {
+                "contains": [
+                  "title",
+                  "检修"
+                ]
+              },
+              {
+                "contains": [
+                  "summary",
+                  "检修"
+                ]
+              }
+            ]
+          },
+          "sources": [
+            "/source/a",
+            "/source/b"
+          ]
+        },
+        "status": 200,
+        "method": "GET"
+      },
+      {
+        "path": "/source/a/capabilities",
+        "body": {
+          "fields": [
+            "title",
+            "summary"
+          ],
+          "operators": [
+            "contains"
+          ],
+          "supportsOr": false,
+          "limit": 10,
+          "nextSupported": true
+        },
+        "status": 200,
+        "method": "GET"
+      },
+      {
+        "path": "/source/a/search",
+        "body": {
+          "items": [
+            {
+              "id": "1",
+              "fields": {
+                "title": "桥梁检修",
+                "summary": "定期维护"
+              }
+            }
+          ],
+          "next": null,
+          "truncated": false
+        },
+        "status": 200,
+        "method": "POST"
+      },
+      {
+        "path": "/source/b/capabilities",
+        "body": {
+          "fields": [
+            "title",
+            "summary"
+          ],
+          "operators": [
+            "contains"
+          ],
+          "supportsOr": false,
+          "limit": 10,
+          "nextSupported": true
+        },
+        "status": 200,
+        "method": "GET"
+      },
+      {
+        "path": "/source/b/search",
+        "body": {
+          "items": [
+            {
+              "id": "1",
+              "fields": {
+                "title": "桥梁检修",
+                "summary": "定期维护"
+              }
+            }
+          ],
+          "next": null,
+          "truncated": false
+        },
+        "status": 200,
+        "method": "POST"
+      }
+    ],
+    "expected": [
+      {
+        "source": "/source/a",
+        "sourceId": "1"
+      },
+      {
+        "source": "/source/b",
+        "sourceId": "1"
+      }
+    ],
+    "forbidden": []
+  },
+  {
+    "name": "split-query-coverage",
+    "routes": [
+      {
+        "path": "/request",
+        "body": {
+          "expr": {
+            "or": [
+              {
+                "contains": [
+                  "title",
+                  "检修"
+                ]
+              },
+              {
+                "contains": [
+                  "summary",
+                  "检修"
+                ]
+              }
+            ]
+          },
+          "sources": [
+            "/source/a"
+          ]
+        },
+        "status": 200,
+        "method": "GET"
+      },
+      {
+        "path": "/source/a/capabilities",
+        "body": {
+          "fields": [
+            "title",
+            "summary"
+          ],
+          "operators": [
+            "contains"
+          ],
+          "supportsOr": false,
+          "limit": 1,
+          "nextSupported": false
+        },
+        "status": 200,
+        "method": "GET"
+      },
+      {
+        "path": "/source/a/search",
+        "body": {
+          "items": [
+            {
+              "id": "x",
+              "fields": {
+                "title": "其他",
+                "summary": "无关"
+              }
+            },
+            {
+              "id": "a",
+              "fields": {
+                "title": "桥梁检修",
+                "summary": "日程"
+              }
+            },
+            {
+              "id": "b",
+              "fields": {
+                "title": "桥梁",
+                "summary": "检修计划"
+              }
+            }
+          ],
+          "next": null,
+          "truncated": false
+        },
+        "status": 200,
+        "method": "POST"
+      }
+    ],
+    "expected": [
+      {
+        "source": "/source/a",
+        "sourceId": "a",
+        "coverage": "exhaustive"
+      },
+      {
+        "source": "/source/a",
+        "sourceId": "b",
+        "coverage": "exhaustive"
+      }
+    ],
+    "forbidden": []
+  }
+]
