@@ -4,6 +4,8 @@
 
 GET /request 返回expr(AST：and/or/not/eq/contains)、sources。GET <source>/capabilities返回fields、operators、supportsOr、limit、nextSupported。POST <source>/search JSON为{expr,cursor可空}，不支持的运算返回422，不能偷偷忽略；响应items、next、truncated，记录有id和fields。每来源id只在该来源稳定，跨来源去重仅按明确globalId；文本contains按本地约定NFC后大小写无关子串。字段缺失为unknown。输出source、sourceId、globalId、predicateStatus(match/unknown)、coverage(exhaustive/partial)、executedQueries；局部复核不得把未知变成不匹配。 expr=null表示无过滤领取；来源先执行受支持的expr再应用limit。cursor是本地来源不透明游标，不应在不同查询间复用；示例服务用十进制偏移编码，但调用方不得依赖该实现。来源返回truncated=true意味着该次查询不穷尽，即便没有next也不能宣布完成。
 
+实现补充：不支持的 `or` 拆为各分支单独查询，不支持的条件不下发；本地对完整条件做三值复核，已知不匹配的资料不进入结果，未知字段保留并记入 issue。每条结果带 `sources`（来源/来源内标识/该来源覆盖）与 `executedConditions`（条件是否由来源执行及执行来源）；跨来源合并只按 `globalId`，字段冲突保留首次取值、列出 `conflictingFields` 并令 `complete=false`。单查询拆分数与页数均有上限；游标重复、越出声明能力或返回不可解析内容时停止并留下缺口。
+
 本地来源只实现以上明确子集，不要求补全同类公开标准。未声明的字段与语法不得自动解释成有效业务事实。样本中的所有人员、账户、样本、设备与文件内容均为合成资料，无生产访问凭据。
 
 ## 接收接口

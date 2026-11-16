@@ -3,4 +3,4 @@ WORKDIR /app
 COPY --chown=node:node . .
 USER node
 ENV NODE_ENV=production
-CMD ["sh", "-c", "npm test && npm run demo"]
+CMD ["sh", "-c", "npm test && npm run demo:feature"]
